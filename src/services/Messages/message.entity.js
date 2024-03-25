@@ -36,3 +36,17 @@ export const getAllMessage = ({ db }) => async (req, res) => {
     res.status(500).send('Something went wrong');
   }
 };
+
+
+export const removeMessage = ({ db }) => async (req, res) => {
+  try {
+    const { id } = req.params;
+    const msg = await db.remove({ table: Message, key: { id } });
+    if (!msg) return res.status(404).send({ messae: 'User not found' });
+    res.status(200).send({ message: 'Deleted Successfully' });
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).send({ message: 'Something went wrong' });
+  }
+};
