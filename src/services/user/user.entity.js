@@ -21,7 +21,7 @@ const ownUpdateAllowed = new Set(['firstName', 'lastName','fullName', 'phone', '
  */
 export const register = ({ db }) => async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const valid = Object.keys(req.body).every(k => createAllowed.has(k));
     if (!valid) return res.status(400).send('Bad request');
     req.body.password = await bcrypt.hash(req.body.password, 8);
