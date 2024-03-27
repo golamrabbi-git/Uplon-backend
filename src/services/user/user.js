@@ -1,14 +1,15 @@
 import { auth, checkRole } from '../middlewares';
-import { getAll, login, logout, me, register, remove, updateOwn, updateUser, userProfile, removeSelected } from './user.entity';
+import { getAll, login, logout, me, register, remove, updateOwn, updateUser, userProfile, removeSelected, isSuperAdmin } from './user.entity';
 
 export default function user() {
-
   /**
   * POST /user
   * @description This route is used to create a user.
   * @response {Object} 200 - the new user.
   */
   this.route.post('/user', register(this));
+
+
 
   /**
   * POST /user/login
@@ -74,4 +75,6 @@ export default function user() {
 */
   this.route.delete('/user/:id', auth, checkRole(['superadmin']), remove(this));
 
+  //check the email belongs to the superadmin
+  this.route.post('/user/admin',isSuperAdmin(this));
 }

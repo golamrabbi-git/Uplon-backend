@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from './user.schema';
+import otpGenerate from '../../utils/otpGenerate';
+import { encryptToken } from '../../utils/AuthToken';
 
 
 /**
@@ -222,6 +224,7 @@ export const updateOwn = ({ db, imageUp }) => async (req, res) => {
 //   }
 // };
 
+
 // WHITOUT PHOTO
 export const updateUser = ({ db, imageUp }) => async (req, res) => {
   try {
@@ -258,10 +261,6 @@ export const remove = ({ db }) => async (req, res) => {
 };
 
 
-
-
-
-
 ///remove ids from an array
 export const removeSelected = ({ db }) => async (req, res) => {
   try {
@@ -277,3 +276,26 @@ export const removeSelected = ({ db }) => async (req, res) => {
     res.status(500).send({ message: 'Something went wrong' });
   }
 };
+
+
+//check if the email belongs to the superadmin
+
+export const isSuperAdmin = ({ db, mail }) => async (req, res) => {
+  // console.log(req.body.email);
+  try {
+    const user = await db.findOne({ table: User, key: { email: req.body.email } });
+    console.log(user.role);
+    if (!user) return res.status(404).send('No result found');
+    const otp = otpGenerate();
+    const token = await encryptToken({ otp, expireTime: Date.now() + 1000 * 60 * 5 });
+    const sendMail = await mail({ receiver: user.email, subject: 'Reset Passwords', body: `Your Reset Password Code ${otp}`, type: 'text' });
+    if (!sendMail) return res.status(500).send('Bad Request');
+    res.status(200).send(token);
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).send({ message: 'Something went wrong' });
+  }
+
+};
+

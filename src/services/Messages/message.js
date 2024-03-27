@@ -8,7 +8,7 @@ export default function message() {
   * @description This route is store messages from user.
   * @response {Object} 200 - message confirmation status.
   */
-  this.route.get('/messages', getAllMessage(this));
+  this.route.get('/messages', auth, checkRole(['admin','superadmin']),getAllMessage(this));
 
   /**
   * POST /message
@@ -16,11 +16,5 @@ export default function message() {
   * @response {Object} 200 - message confirmation status.
   */
   this.route.post('/message', addMessage(this));
-
-
-
-
-
-
 
 }

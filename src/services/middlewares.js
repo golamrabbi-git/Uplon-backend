@@ -31,7 +31,7 @@ export async function auth(req, res, next) {
   try {
     // console.log(req.cookies[settings.secret]);
     const token = req.cookies[settings.secret] || (process.env.NODE_ENV === 'development' ? req.header('Authorization')?.replace('Bearer ', '') : null);
-    console.log('token',token);
+    // console.log('token',token);
     if (!token) return res.status(401).send({ status: 401, reason: 'Unauthorized' });
     const user = await decodeAuthToken(token);
     if (!user || user.status === 'deactive') return res.status(401).send({ status: 401, reason: 'Unauthorized' });

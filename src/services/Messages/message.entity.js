@@ -1,5 +1,3 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import Message from './message.schema';
 
 const createAllowed = new Set(['message', 'deletion_date', 'deletion_time', 'photo']);
