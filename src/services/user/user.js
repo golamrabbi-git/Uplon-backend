@@ -1,5 +1,5 @@
 import { auth, checkRole } from '../middlewares';
-import { getAll, login, logout, me, register, remove, updateOwn, updateUser, userProfile, removeSelected, isSuperAdmin } from './user.entity';
+import { getAll, login, logout, me, register, remove, updateOwn, updateUser, userProfile, removeSelected, forgotPassword, verifyOtp } from './user.entity';
 
 export default function user() {
   /**
@@ -8,7 +8,6 @@ export default function user() {
   * @response {Object} 200 - the new user.
   */
   this.route.post('/user', register(this));
-
 
 
   /**
@@ -75,6 +74,24 @@ export default function user() {
 */
   this.route.delete('/user/:id', auth, checkRole(['superadmin']), remove(this));
 
-  //check the email belongs to the superadmin
-  this.route.post('/user/admin',isSuperAdmin(this));
+  /**
+  * POST /user/forgot/password
+  * @description this route is used to send otp for forgoot password.
+  * @response - encrypted token
+  */
+  this.route.post('/user/forgot/password', forgotPassword(this));
+
+  /**
+  * POST /user/otp/verify
+  * @description this route is used to verify user otp.
+  * @response - success or fail message
+  */
+  this.route.post('/user/verify/otp', verifyOtp(this));
+
+  /**
+  * POST /user/otp/verify
+  * @description this route is used to verify user otp.
+  * @response - success or fail message
+  */
+  // this.route.post('/user/change/password', changePassword(this));
 }

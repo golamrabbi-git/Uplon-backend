@@ -2,7 +2,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from './user.schema';
 import otpGenerate from '../../utils/otpGenerate';
-import { encryptToken } from '../../utils/AuthToken';
+import { decryptToken, encryptToken } from '../../utils/AuthToken';
+
 
 
 /**
@@ -280,15 +281,19 @@ export const removeSelected = ({ db }) => async (req, res) => {
 
 //check if the email belongs to the superadmin
 
-export const isSuperAdmin = ({ db, mail }) => async (req, res) => {
+export const forgotPassword = ({ db, mail }) => async (req, res) => {
   // console.log(req.body.email);
   try {
     const user = await db.findOne({ table: User, key: { email: req.body.email } });
-    console.log(user.role);
+    console.log(user.id);
     if (!user) return res.status(404).send('No result found');
-    const otp = otpGenerate();
-    const token = await encryptToken({ otp, expireTime: Date.now() + 1000 * 60 * 5 });
-    const sendMail = await mail({ receiver: user.email, subject: 'Reset Passwords', body: `Your Reset Password Code ${otp}`, type: 'text' });
+    // const otp = otpGenerate();
+    const userId = user.id;
+    const token = await encryptToken({ userId , expireTime: Date.now() + 1000 * 60 * 5 });
+
+    const resetUrl = `http://localhost:5173/forgot-password/${user.id}?token=${token}`;
+
+    const sendMail = await mail({ receiver: user.email, subject: 'Reset Passwords', body: `${resetUrl}`, type: 'text' });
     if (!sendMail) return res.status(500).send('Bad Request');
     res.status(200).send(token);
   }
@@ -299,3 +304,23 @@ export const isSuperAdmin = ({ db, mail }) => async (req, res) => {
 
 };
 
+
+/**
+ * This function is used to verify user password.
+ * @param {Object} req This is the request object.
+ * @param {Object} res this is the response object
+ * @returns It returns the updated data.
+ */
+export const verifyOtp = () => async (req, res) => {
+  try {
+    const { otp, expireTime } = decryptToken(req.body.token);
+
+    if (Date.now() > expireTime) return res.status(400).send({ status: false, messae: 'OTP code is expired' });
+    if (!(otp === req.body.otp)) return res.status(400).send({ status: false, messae: 'Invalid OTP code' });
+
+    res.status(200).send({ status: true, message: 'Verified', token: req.body.token });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: 'Something went wrong' });
+  }
+};
