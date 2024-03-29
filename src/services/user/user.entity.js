@@ -7,6 +7,93 @@ import settings from '../../settings';
 
 
 
+// Generate HTML email template
+const generateEmailTemplate = (url) => {
+
+  return `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset Password</title>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            position: relative;
+        }
+
+        .container {
+            width: 500px;
+            height: auto;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .whale-swap-heading {
+            color: #3B82F6;
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        .heading {
+            font-size: 30px;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        .para1 {
+            font-size: 18px;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        .reset-button {
+            font-size: 18px;
+            background-color: #3B82F6;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        .para2 {
+            font-size: 16px;
+            color: gray;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="whale-swap-heading">Whale Swap</h1>
+        <h1 class="heading">Password Reset</h1>
+        <p class="para1">If you've lost your password or wish to reset it <br> use the link below to reset the password.</p>
+        <a href="${url}" class="reset-button">Reset Your Password</a><br>
+        <p class="para2">If you did not request for a password reset, you can safely ignore this email.</p>
+    </div>
+</body>
+
+</html>`;
+};
+
 /**
  * these are the set to validate the request body or query.
  */
@@ -291,7 +378,7 @@ export const forgotPassword = ({ db, mail , settings}) => async (req, res) => {
     const userId = user._id;
     const token =  jwt.sign({ userId, expireTime: Date.now() + 1000 * 60 * 5 },settings.tokenKey);
     const resetUrl = `http://localhost:5173/forgot-password/${token}`;
-    const sendMail = await mail({ receiver: user.email, subject: 'Reset Passwords', body: `${resetUrl}`, type: 'text' });
+    const sendMail = await mail({ receiver: user.email, subject: 'Reset Passwords', body: `${generateEmailTemplate(resetUrl)}`, type: 'html' });
     if (!sendMail) return res.status(500).send('Bad Request');
     res.status(200).send(token);
   }

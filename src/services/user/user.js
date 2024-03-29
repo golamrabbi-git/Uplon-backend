@@ -82,8 +82,6 @@ export default function user() {
   this.route.post('/user/forgot/password', forgotPassword(this));
 
 
-
-
   /**
   * POST /user/otp/verify
   * @description this route is used to verify user otp.
