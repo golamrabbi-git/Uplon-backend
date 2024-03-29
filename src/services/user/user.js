@@ -1,5 +1,5 @@
 import { auth, checkRole } from '../middlewares';
-import { getAll, login, logout, me, register, remove, updateOwn, updateUser, userProfile, removeSelected, forgotPassword, verifyOtp } from './user.entity';
+import { getAll, login, logout, me, register, remove, updateOwn, updateUser, userProfile, removeSelected, forgotPassword, verifyOtp, changePassword } from './user.entity';
 
 export default function user() {
   /**
@@ -81,17 +81,13 @@ export default function user() {
   */
   this.route.post('/user/forgot/password', forgotPassword(this));
 
-  /**
-  * POST /user/otp/verify
-  * @description this route is used to verify user otp.
-  * @response - success or fail message
-  */
-  this.route.post('/user/verify/otp', verifyOtp(this));
+
+
 
   /**
   * POST /user/otp/verify
   * @description this route is used to verify user otp.
   * @response - success or fail message
   */
-  // this.route.post('/user/change/password', changePassword(this));
+  this.route.post('/user/change/password', changePassword(this));
 }
